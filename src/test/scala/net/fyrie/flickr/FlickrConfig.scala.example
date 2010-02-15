@@ -1,5 +1,9 @@
-package net.fyrie.flickr.specs
+package net.fyrie.flickr
+package specs
 
 trait FlickrConfig {
+  self: Flickr =>
+
   val apiKey = "APIKEY"
+  val apiSecret = "SECRET"
 }
