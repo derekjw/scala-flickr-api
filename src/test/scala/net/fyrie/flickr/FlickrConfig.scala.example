@@ -1,0 +1,5 @@
+package net.fyrie.flickr.specs
+
+trait FlickrConfig {
+  val apiKey = "APIKEY"
+}

@@ -3,15 +3,9 @@ package specs
 
 import org.specs._
 
-import net.lag.configgy.Configgy
-
 class FlickrSpec extends Specification("Flickr API") {
 
-  Configgy.configure("flickr.conf")
-  
-  val config = Configgy.config
-
-  val flickr = new Flickr(config.getString("key", "APIKEY"))
+  val flickr = new Flickr with FlickrConfig
 
   "api requests" should {
     "succeed with echo test" in {

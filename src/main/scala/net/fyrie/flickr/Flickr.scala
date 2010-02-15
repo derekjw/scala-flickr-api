@@ -4,8 +4,10 @@ import xml.{Node, XML}
 import dispatch._
 import net.liftweb.common._
 
-class Flickr(apiKey: String) {
+abstract class Flickr {
   val endpoint = :/("api.flickr.com") / "services" / "rest"
+
+  val apiKey: String
 
   protected val http = new Http with Threads {
     override lazy val log: Logger = new Logger {
@@ -18,9 +20,12 @@ class Flickr(apiKey: String) {
 
   protected def get[T](method: String, params: Map[String,Any])(block: Seq[xml.Elem] => T): Box[T] =
     http(endpoint <<? (params ++ Map("method" -> method, "api_key" -> apiKey)) <> {
-      case rsp if (rsp \ "@stat").text == "ok" => Full(block(rsp.child.partialMap{case x: xml.Elem => x}))
-      case rsp if (rsp \ "@stat").text == "fail" => Failure("Flickr API Error "+(rsp \ "err" \ "@code").text+": "+(rsp \ "err" \ "@msg").text)
-      case rsp => Failure("Flickr API Unknown Error: "+rsp)
+      case rsp if (rsp \ "@stat").text == "ok" =>
+        Full(block(rsp.child.partialMap{case x: xml.Elem => x}))
+      case rsp if (rsp \ "@stat").text == "fail" =>
+        Failure("Flickr API Error "+(rsp \ "err" \ "@code").text+": "+(rsp \ "err" \ "@msg").text)
+      case rsp =>
+        Failure("Flickr API Unknown Error: "+rsp)
     })
 
   object test {
