@@ -4,7 +4,7 @@ import xml.{Node, XML}
 import dispatch._
 import net.liftweb.common._
 import java.security.MessageDigest
-
+import collection.SortedMap
 
 abstract class Flickr {
   val endpoint = :/("api.flickr.com") / "services" / "rest"
@@ -12,7 +12,11 @@ abstract class Flickr {
   val apiKey: String
   val apiSecret: String
 
-  protected val http = new Http with Threads {
+  val params = new {
+    def apply(method: String) = SortedMap("api_key" -> apiKey, "method" -> method)
+  }
+
+  val http = new Http with Threads {
     override lazy val log: Logger = new Logger {
       val logger = org.slf4j.LoggerFactory.getLogger(classOf[Flickr])
       def info(msg: String, items: Any*) {
@@ -21,8 +25,8 @@ abstract class Flickr {
     }
   }
 
-  protected def get[T](method: String, params: Map[String,Any])(block: Seq[xml.Elem] => Box[T]): Box[T] =
-    http(endpoint <<? (params ++ Map("method" -> method, "api_key" -> apiKey)) <> {
+  def get[T](query: SortedMap[String,Any])(block: Seq[xml.Elem] => Box[T]): Box[T] =
+    http(endpoint <<? query <> {
       case rsp if (rsp \ "@stat").text == "ok" =>
         block(rsp.child.partialMap{case x: xml.Elem => x})
       case rsp if (rsp \ "@stat").text == "fail" =>
@@ -31,23 +35,28 @@ abstract class Flickr {
         Failure("Flickr API Unknown Error: "+rsp)
     })
 
+  def sign(query: SortedMap[String,Any]) =
+    query + ("api_sig" -> md5SumString(apiSecret+query.map{case (k,v) => k+v}.mkString))
+
   object test {
-    def echo(parameters: (String, String)*) =
-      get("flickr.test.echo", Map(parameters:_*)){
+    def echo(values: (String, String)*) =
+      get(params("flickr.test.echo") ++ values){
         result =>
           Full(result.map(x => (x.label, x.text)).toMap)
       }
   }
 
   object auth {
-    def getFrob = {
-      get("flickr.auth.getFrob", Map("api_sig" -> md5SumString(apiSecret+"api_key"+apiKey+"methodflickr.auth.getFrob"))){
+    def getFrob =
+      get(sign(params("flickr.auth.getFrob"))){
         result =>
           Box(result.map{
-            case <frob>{frob}</frob> => frob
+            case <frob>{frob}</frob> => frob.toString
           }.headOption)
       }
-    }
+
+    def loginUrl(frob: String) =
+      (:/("api.flickr.com") / "services" / "auth" <<? sign(SortedMap("api_key" -> apiKey, "frob" -> frob, "perms" -> "read"))).to_uri
   }
 
   def md5SumString(bytes : String) : String = {
