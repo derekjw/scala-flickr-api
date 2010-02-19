@@ -51,7 +51,7 @@ abstract class Flickr {
       get(sign(params("flickr.auth.getFrob"))){
         result =>
           Box(result.map{
-            case <frob>{frob}</frob> => frob.toString
+            case <frob>{frob}</frob> => Frob(frob.toString)
           }.headOption)
       }
 
@@ -70,3 +70,4 @@ abstract class Flickr {
   def shutdown: Unit = http.shutdown
 }
 
+case class Frob(value: String)
