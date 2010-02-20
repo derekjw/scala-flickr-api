@@ -14,7 +14,13 @@ class FlickrApiProject(info: ProjectInfo) extends DefaultProject(info) {
   val fyrieReleases = "Fyrie Releases" at "http://repo.fyrie.net/releases/"
 
   override def managedStyle = ManagedStyle.Maven
-  val publishTo = "Fyrie Nexus" at "http://nexus.fyrie.net/content/repositories/releases/"
+  val publishTo = projectVersion.value match {
+    case BasicVersion(_,_,_,Some("SNAPSHOT")) =>
+      "Fyrie Nexus Snapshots" at "http://nexus.fyrie.net/content/repositories/snapshots/"
+    case _ =>
+      "Fyrie Nexus Releases" at "http://nexus.fyrie.net/content/repositories/releases/"
+  }
   Credentials(Path.userHome / ".ivy2" / ".fyrie-credentials", log)
+
 }
 
