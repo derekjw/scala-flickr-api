@@ -19,6 +19,8 @@ abstract class Flickr extends Logger {
   }
 
   val http = new Http with Threads {
+    self.info("Starting new Threaded Http Connection")
+
     override lazy val log = new DLogger {
       def info(msg: String, items: Any*) {
         self.info(msg.format(items: _*))
@@ -56,8 +58,18 @@ abstract class Flickr extends Logger {
           }.headOption)
       }
 
-    def loginUrl(frob: String) =
-      (:/("api.flickr.com") / "services" / "auth" <<? sign(SortedMap("api_key" -> apiKey, "frob" -> frob, "perms" -> "read"))).to_uri
+    def loginUrl(frob: Frob) =
+      (:/("api.flickr.com") / "services" / "auth" <<? sign(SortedMap("api_key" -> apiKey, "frob" -> frob.value, "perms" -> "read"))).to_uri
+
+    def getToken(frob: Frob) =
+      get(sign(params("flickr.auth.getToken") + ("frob" -> frob.value))){
+        result =>
+          Full(Token((result \ "token").text,
+                     (result \ "perms").text,
+                     User((result \ "user" \ "@nsid").text,
+                          (result \ "user" \ "@username").text,
+                          (result \ "user" \ "@fullname").text)))
+      }
   }
 
   def md5SumString(bytes : String) : String = {
@@ -68,7 +80,12 @@ abstract class Flickr extends Logger {
     md5.digest().map(0xFF & _).map { "%02x".format(_) }.foldLeft(""){_ + _}
   }
 
-  def shutdown: Unit = http.shutdown
+  def shutdown: Unit = {
+    info("Shutting down Threaded Http Connection")
+    http.shutdown
+  }
 }
 
 case class Frob(value: String)
+case class Token(value: String, perms: String, user: User)
+case class User(nsid: String, userName: String, fullName: String)
