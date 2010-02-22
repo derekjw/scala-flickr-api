@@ -6,7 +6,6 @@ class FlickrApiProject(info: ProjectInfo) extends DefaultProject(info) {
 
   val dispatchHttp = "net.databinder" %% "dispatch-http" % "0.7.1"
   val liftCommon = "net.liftweb" % "lift-common" % "2.0-scala280-SNAPSHOT"
-  val slf4jApi = "org.slf4j" % "slf4j-api" % "1.5.10"
   val logbackClassic = "ch.qos.logback" % "logback-classic" % "0.9.18" % "test"
   val specs = "org.scala-tools.testing" %% "specs" % "1.6.3" % "test"
 
