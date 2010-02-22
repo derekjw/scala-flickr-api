@@ -1,12 +1,15 @@
-package net.fyrie.flickr
+package net.fyrie
+package flickr
 package specs
 
 import org.specs._
 import net.fyrie.specs.matcher._
 
+class Flickr extends flickr.Flickr with FlickrConfig
+
 class FlickrSpec extends Specification("Flickr API") with BoxMatchers {
 
-  val flickr = new Flickr with FlickrConfig
+  val flickr = new Flickr
 
   "flickr.test.echo" should {
     "succeed" in {
@@ -25,4 +28,3 @@ class FlickrSpec extends Specification("Flickr API") with BoxMatchers {
   doAfterSpec {flickr.shutdown}
 
 }
-

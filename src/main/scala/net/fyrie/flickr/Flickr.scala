@@ -1,12 +1,14 @@
 package net.fyrie.flickr
 
 import xml.{Node, XML}
-import dispatch._
+import dispatch.{Logger => DLogger, _}
 import net.liftweb.common._
 import java.security.MessageDigest
 import collection.SortedMap
 
-abstract class Flickr {
+abstract class Flickr extends Logger {
+  self =>
+
   val endpoint = :/("api.flickr.com") / "services" / "rest"
 
   val apiKey: String
@@ -17,10 +19,9 @@ abstract class Flickr {
   }
 
   val http = new Http with Threads {
-    override lazy val log: Logger = new Logger {
-      val logger = org.slf4j.LoggerFactory.getLogger(classOf[Flickr])
+    override lazy val log = new DLogger {
       def info(msg: String, items: Any*) {
-        logger.info(msg.format(items: _*))
+        self.info(msg.format(items: _*))
       }
     }
   }
