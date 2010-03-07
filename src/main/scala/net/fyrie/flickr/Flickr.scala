@@ -92,6 +92,16 @@ abstract class Flickr extends Logger {
                           (result \ "user" \ "@username").text,
                           (result \ "user" \ "@fullname").text)))
       }
+
+    def getFullToken(token: String) =
+      get(sign(params("flickr.auth.getFullToken") + ("mini_token" -> token))){
+        result =>
+          Full(Token((result \ "token").text,
+                     (result \ "perms").text,
+                     User((result \ "user" \ "@nsid").text,
+                          (result \ "user" \ "@username").text,
+                          (result \ "user" \ "@fullname").text)))
+      }
   }
 
   def upload(token: String,
@@ -101,7 +111,7 @@ abstract class Flickr extends Logger {
              tags: Option[List[String]] = None,
              isPublic: Option[Boolean] = None,
              isFriend: Option[Boolean] = None,
-             isFamily: Option[Boolean] =None,
+             isFamily: Option[Boolean] = None,
              safetyLevel: Option[Int] = None,
              contentType: Option[Int] = None,
              hidden: Option[Boolean] = None) =
