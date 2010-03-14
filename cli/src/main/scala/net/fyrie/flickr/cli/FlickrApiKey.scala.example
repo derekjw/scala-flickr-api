@@ -1,0 +1,7 @@
+package net.fyrie.flickr.cli
+
+trait FlickrApiKey {
+  val apiKey = "YOURKEY"
+  val apiSecret = "YOURSECRET"
+  val apiAuthUrl = "YOURAUTHURL"
+}
