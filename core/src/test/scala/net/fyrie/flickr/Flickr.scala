@@ -8,7 +8,6 @@ import net.fyrie.specs.matcher._
 object Flickr extends FlickrMock with FlickrConfig
 
 class FlickrSpec extends Specification("Flickr API") with BoxMatchers {
-  import UserData._
 
   "flickr.test.echo" should {
     "succeed" in {
@@ -40,7 +39,7 @@ class FlickrSpec extends Specification("Flickr API") with BoxMatchers {
 
   "flickr.upload" should {
     "succeed" in {
-      val rsp = Flickr.upload(token.value,
+      val rsp = Flickr.upload("token",
                               new java.io.File("testfile.jpg"),
                               isPublic = Some(false),
                               title = Some("Test Photo"))
