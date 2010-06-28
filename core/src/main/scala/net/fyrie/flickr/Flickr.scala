@@ -43,7 +43,7 @@ abstract class Flickr extends Logger {
 
   def handleResponse[T](rsp: xml.Elem)(block: Seq[xml.Elem] => Box[T]): Box[T] = rsp match {
     case rsp if (rsp \ "@stat").text == "ok" =>
-      block(rsp.child.partialMap{case x: xml.Elem => x})
+      block(rsp.child.collect{case x: xml.Elem => x})
     case rsp if (rsp \ "@stat").text == "fail" =>
       Failure("Flickr API Error "+(rsp \ "err" \ "@code").text+": "+(rsp \ "err" \ "@msg").text)
     case rsp =>

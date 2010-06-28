@@ -28,11 +28,11 @@ class FlickrProject(info: ProjectInfo) extends ParentProject(info) {
    
     override def compileOptions = super.compileOptions ++ Seq(Unchecked)
     
-    val dispatchHttp = "net.databinder" %% "dispatch-http" % "0.7.1"
-    val dispatchMime = "net.databinder" %% "dispatch-mime" % "0.7.1"
+    val dispatchHttp = "net.databinder" %% "dispatch-http" % "0.7.4"
+    val dispatchMime = "net.databinder" %% "dispatch-mime" % "0.7.4"
     val liftCommon = "net.liftweb" % "lift-common" % "2.0-scala280-SNAPSHOT"
     val logbackClassic = "ch.qos.logback" % "logback-classic" % "0.9.18" % "test"
-    val specs = "org.scala-tools.testing" %% "specs" % "1.6.3" % "test"
+    val specs = "org.scala-tools.testing" %% "specs" % "1.6.5-SNAPSHOT" % "test"
  
   }
 
